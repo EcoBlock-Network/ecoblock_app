@@ -1,4 +1,7 @@
 use super::storage::NODE_LIST;
+use std::net::TcpStream;
+use std::time::Duration;
+
 
 
 /// Add a node to the network.
@@ -31,4 +34,12 @@ pub fn node_exists(address: String) -> bool {
 /// List all nodes in the network.
 pub fn list_nodes() -> Vec<String> {
     NODE_LIST.lock().unwrap().clone()
+}
+
+/// Check if a node is reachable via TCP connection.
+pub fn check_node_connectivity(address: &str) -> Result<bool, String> {
+    match TcpStream::connect_timeout(&address.parse().unwrap(), Duration::from_secs(2)) {
+        Ok(_) => Ok(true),
+        Err(e) => Err(format!("Failed to connect to {}: {}", address, e)),
+    }
 }
